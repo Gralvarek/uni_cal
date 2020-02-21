@@ -28,14 +28,12 @@ def main():
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
-    
+        
     service = build('calendar', 'v3', credentials = creds)
-    start_date = semester_calendar['start_second_half']
-    friday = next_weekday(start_date, Day.Friday)
-    start_time = create_date_from_ds(friday, 5, True)
-    end_time = create_date_from_ds(friday, 5, False)
-    event = populate_event("Practice", "Barkhausen Bau", start_time, end_time, semester_calendar['end_second_half'])
-    event = service.events().insert(calendarId='primary', body=event).execute()
+    input_classes(service)
+
+    
+    
 
 
 def populate_event(summary, location, start_date_time, end_date_time, until_date):
@@ -45,26 +43,43 @@ def populate_event(summary, location, start_date_time, end_date_time, until_date
     'end' : {'dateTime' : end_date_time.isoformat(), 'timeZone' : 'Europe/Berlin'},
     'recurrence' : ['RRULE:FREQ=WEEKLY;UNTIL=' + until_date.isoformat().replace("-", "").replace(":","") + 'Z']}
 
-def ask_information():
+def input_classes(service):
+    input_dict = {}
     break_condition = False
     while(break_condition == False):
         print("Which class?:")
-        yield input()
+        input_dict['summary'] = input()
 
         print("Where?:")
-        yield input()
+        input_dict['location'] = input()
 
         print("Which Day?:")
-        yield input()
+        input_dict['dayof'] = int(input())
 
         print("Which DS?:")
-        yield input()
+        input_dict['ds'] = int(input())
+
+        post_to_calendar(service, input_dict)
 
         print("Continue? (y/n):")
         user_input = input()
-        if(user_input == "y"):
+        if(user_input == "n"):
             break_condition = True
         
+def post_to_calendar(service, input_dict):
+    start_date = semester_calendar['start_first_half']
+    weekday = next_weekday(start_date, input_dict['dayof'])
+    start_time = create_date_from_ds(weekday, input_dict['ds'], True)
+    end_time = create_date_from_ds(weekday, input_dict['ds'], False)
+    event = populate_event(input_dict['summary'], input_dict['location'], start_time, end_time, semester_calendar['end_first_half'])
+    service.events().insert(calendarId='primary', body=event).execute()
+
+    start_date = semester_calendar['start_second_half']
+    weekday = next_weekday(start_date, input_dict['dayof'])
+    start_time = create_date_from_ds(weekday, input_dict['ds'], True)
+    end_time = create_date_from_ds(weekday, input_dict['ds'], False)
+    event = populate_event(input_dict['summary'], input_dict['location'], start_time, end_time, semester_calendar['end_second_half'])
+    service.events().insert(calendarId='primary', body=event).execute()
 
 
 
