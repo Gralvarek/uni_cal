@@ -5,7 +5,6 @@ import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-from enum import IntEnum
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -31,10 +30,6 @@ def main():
         
     service = build('calendar', 'v3', credentials = creds)
     input_classes(service)
-
-    
-    
-
 
 def populate_event(summary, location, start_date_time, end_date_time, until_date):
     return {'summary' : summary, 
@@ -93,15 +88,6 @@ ds_calendar = {
     7:{'start': {'hour': 18, 'minute':30}, 'end': {'hour': 20, 'minute':0}},
     8:{'start': {'hour': 20, 'minute':20}, 'end': {'hour': 21, 'minute':50}}
 }
-
-class Day(IntEnum):
-    Monday = 0
-    Tuesday = 1
-    Wednesday = 2
-    Thursday = 3
-    Friday = 4
-    Saturday = 5
-    Sunday = 6
 
 def next_weekday(dt, day):
     return dt + datetime.timedelta(days=((day-dt.weekday())%7))
