@@ -137,3 +137,5 @@ dmypy.json
 
 credentials.json
 token.pickle
+tests.py
+quickstart.py
