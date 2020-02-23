@@ -33,12 +33,13 @@ def main():
     input_classes(service)
 
 def populate_event(summary, location, start_date_time, end_date_time, until_date):
-    return {'summary' : summary, 
-    'location' : location, 
-    'start' : {'dateTime' : start_date_time.isoformat(), 'timeZone' : 'Europe/Berlin'}, 
-    'end' : {'dateTime' : end_date_time.isoformat(), 'timeZone' : 'Europe/Berlin'},
-    'recurrence' : ['RRULE:FREQ=WEEKLY;UNTIL=' + until_date.isoformat().replace("-", "").replace(":","") + 'Z', 
-        'EXDATE:' + holidays[0].isoformat().replace("-", "").replace(":","") + "Z" + "," + holidays[1].isoformat().replace("-", "").replace(":","") + 'Z']}
+    return {
+        'summary' : summary, 
+        'location' : location, 
+        'start' : {'dateTime' : start_date_time.isoformat(), 'timeZone' : 'Europe/Berlin'}, 
+        'end' : {'dateTime' : end_date_time.isoformat(), 'timeZone' : 'Europe/Berlin'},
+        'recurrence' : ['RRULE:FREQ=WEEKLY;UNTIL=' + until_date.isoformat().replace("-", "").replace(":","") + 'Z']
+    }
 
 def input_classes(service):
     input_dict = {}
@@ -70,7 +71,7 @@ def post_to_calendar(service, input_dict):
     end_time = create_date_from_ds(weekday, input_dict['ds'], False)
     event = populate_event(input_dict['summary'], input_dict['location'], start_time, end_time, semester_calendar['end_first_half'])
     service.events().insert(calendarId='primary', body=event).execute()
-    print(event)
+
     start_date = semester_calendar['start_second_half']
     weekday = next_weekday(start_date, input_dict['dayof'])
     start_time = create_date_from_ds(weekday, input_dict['ds'], True)
